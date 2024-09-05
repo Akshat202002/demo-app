@@ -2,7 +2,7 @@ package com.akshat.todo_backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
 import com.akshat.todo_backend.model.Todo;
 import com.akshat.todo_backend.service.TodoService;
 
@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/todos")
+@CrossOrigin(origins = "*")
 public class TodoController {
     @Autowired
     private TodoService todoService;

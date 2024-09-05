@@ -1,34 +1,52 @@
 import { CommonModule } from '@angular/common'; 
-import { Component } from '@angular/core'; 
+import { Component, OnInit } from '@angular/core'; 
 import { FormsModule } from '@angular/forms'; 
 import { RouterOutlet } from '@angular/router';
+import { TodoService, Todo } from './services/todo.service';
 
 @Component({ 
     selector: 'app-root', 
     standalone: true, 
     imports: [RouterOutlet, FormsModule, CommonModule], 
     templateUrl: './app.component.html',
-    styleUrl: './app.component.scss' 
+    styleUrls: ['./app.component.scss'] 
 }) 
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'Todo App';
   taskName: string = '';
   taskDescription: string = '';
-  tasks: { name: string, description: string }[] = [];
+  tasks: Todo[] = [];
   isEditMode: boolean = false;
   editIndex: number | null = null;
 
+  constructor(private todoService: TodoService) {}
+
+  ngOnInit(): void {
+    this.loadTodos();
+  }
+
+  loadTodos(): void {
+    this.todoService.getTodos().subscribe(todos => {
+      this.tasks = todos;
+    });
+  }
+
   addOrUpdateTask(event: Event): void {
     event.preventDefault();
+    const todo: Todo = { name: this.taskName, description: this.taskDescription };
+
     if (this.isEditMode && this.editIndex !== null) {
-      this.tasks[this.editIndex] = { name: this.taskName, description: this.taskDescription };
-      this.isEditMode = false;
-      this.editIndex = null;
+      const id = this.tasks[this.editIndex].id!;
+      this.todoService.updateTodo(id, todo).subscribe(updatedTodo => {
+        this.tasks[this.editIndex!] = updatedTodo;
+        this.resetForm();
+      });
     } else {
-      this.tasks.push({ name: this.taskName, description: this.taskDescription });
+      this.todoService.createTodo(todo).subscribe(newTodo => {
+        this.tasks.push(newTodo);
+        this.resetForm();
+      });
     }
-    this.taskName = '';
-    this.taskDescription = '';
   }
 
   editTask(index: number): void {
@@ -39,12 +57,17 @@ export class AppComponent {
   }
 
   deleteTask(index: number): void {
-    this.tasks.splice(index, 1);
-    if (this.isEditMode && this.editIndex === index) {
-      this.isEditMode = false;
-      this.editIndex = null;
-      this.taskName = '';
-      this.taskDescription = '';
-    }
+    const id = this.tasks[index].id!;
+    this.todoService.deleteTodo(id).subscribe(() => {
+      this.tasks.splice(index, 1);
+      this.resetForm();
+    });
+  }
+
+  resetForm(): void {
+    this.taskName = '';
+    this.taskDescription = '';
+    this.isEditMode = false;
+    this.editIndex = null;
   }
 }
