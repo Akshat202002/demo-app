@@ -1,0 +1,20 @@
+<header class="flex w-full justify-center"> 
+    <h1 class="text-center text-3xl font-bold">{{title}}</h1> 
+</header> 
+<main> 
+    <div class="m-5"> 
+        <form class="flex justify-center items-center space-x-2" (submit)="addTask($event)"> 
+        <div class = "mb-3 flex items-center"> 
+            <label for="name" class="pr-5 hidden" aria-label="Name of the task">Name of the Task: </label> 
+            <input type="text" name="name" class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" placeholder="Input Task" [(ngModel)]="taskName" required>
+         </div> 
+        <button type="submit" id="add- task-form" class="h-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add Task</button> 
+        
+        </form> 
+        <ul class="mt-5"> 
+            @for (task of tasks; track task) { 
+                <li class="border-b py-2">{{ task }}</li>
+            } 
+        </ul> 
+    </div> 
+</main>
