@@ -15,6 +15,11 @@
       <button type="submit" id="add-task-form" class="h-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto">{{ isEditMode ? 'Update Task' : 'Add Task' }}</button>
     </form>
 
+    <!-- Search Bar -->
+    <div class="mt-5">
+        <input type="text" placeholder="Search tasks..." [(ngModel)]="searchKeyword" (input)="searchTasks()" class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-full sm:w-auto">
+    </div>
+
     <ul class="mt-5 space-y-4">
       @for (task of tasks; track task; let i = $index) {
         <li class="border rounded-lg shadow-md p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white hover:bg-gray-100 transition duration-300">

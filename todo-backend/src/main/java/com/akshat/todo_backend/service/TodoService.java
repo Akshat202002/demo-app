@@ -29,4 +29,8 @@ public class TodoService {
     public void deleteTodoById(Long id) {
         todoRepository.deleteById(id);
     }
+
+    public List<Todo> searchTodos(String keyword) {
+        return todoRepository.searchTodos(keyword);
+    }
 }

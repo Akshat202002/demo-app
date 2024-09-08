@@ -12,12 +12,13 @@ import { TodoService, Todo } from './services/todo.service';
     styleUrls: ['./app.component.scss'] 
 }) 
 export class AppComponent implements OnInit {
-  title = 'Todo App';
+  title: string = 'Todo App';
   taskName: string = '';
   taskDescription: string = '';
   tasks: Todo[] = [];
   isEditMode: boolean = false;
   editIndex: number | null = null;
+  searchKeyword: string = '';
 
   constructor(private todoService: TodoService) {}
 
@@ -69,5 +70,15 @@ export class AppComponent implements OnInit {
     this.taskDescription = '';
     this.isEditMode = false;
     this.editIndex = null;
+  }
+
+  searchTasks() {
+    if (this.searchKeyword.trim() === '') {
+        this.loadTodos();
+    } else {
+        this.todoService.searchTodos(this.searchKeyword).subscribe((tasks) => {
+            this.tasks = tasks;
+        });
+    } 
   }
 }
