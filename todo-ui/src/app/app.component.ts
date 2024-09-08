@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
 
   loadTodos(): void {
     this.todoService.getTodos().subscribe(todos => {
-      this.tasks = todos;
+      this.tasks = todos.sort((a, b) => Number(a.completed) - Number(b.completed));
     });
   }
 
@@ -86,5 +86,9 @@ export class AppComponent implements OnInit {
     this.todoService.createOrUpdateTodo(task).subscribe(() => {
         this.loadTodos();
     });
-}
+  }
+
+  sortTasks(): void {
+    this.tasks.sort((a, b) => Number(a.completed) - Number(b.completed));
+  }
 }

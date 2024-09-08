@@ -24,8 +24,8 @@
       @for (task of tasks; track task; let i = $index) {
         <li class="border rounded-lg shadow-md p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white hover:bg-gray-100 transition duration-300">
           <div class="flex-1">
-            <h3 class="font-bold text-lg text-gray-800">{{ task.name }}</h3>
-            <p class="text-gray-600">{{ task.description }}</p>
+            <h3 class="font-bold text-lg text-gray-800" [class.line-through]="task.completed">{{ task.name }}</h3>
+            <p class="text-gray-600" [class.line-through]="task.completed">{{ task.description }}</p>
           </div>
           <div class="flex space-x-2 mt-2 sm:mt-0">
             <input type="checkbox" [(ngModel)]="task.completed" (change)="updateTaskStatus(task)" class="mr-2">
