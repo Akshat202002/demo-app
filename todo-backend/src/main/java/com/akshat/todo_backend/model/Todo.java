@@ -11,6 +11,7 @@ public class Todo {
     private Long id;
     private String name;
     private String description;
+    private boolean completed;
     
     // Getters and Setters
     public Long getId() {
@@ -32,5 +33,12 @@ public class Todo {
     }
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
 }

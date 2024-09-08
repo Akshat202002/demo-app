@@ -81,4 +81,10 @@ export class AppComponent implements OnInit {
         });
     } 
   }
+
+  updateTaskStatus(task: Todo) {
+    this.todoService.createOrUpdateTodo(task).subscribe(() => {
+        this.loadTodos();
+    });
+}
 }

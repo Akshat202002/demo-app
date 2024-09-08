@@ -7,6 +7,7 @@ export interface Todo {
   id?: number;
   name: string;
   description: string;
+  completed?: boolean;
 }
 
 @Injectable({
@@ -43,5 +44,13 @@ export class TodoService {
     return this.http.get<Todo[]>(`${this.apiUrl}/search`, {
       params: { keyword }
     });
+  }
+
+  createOrUpdateTodo(todo: Todo): Observable<Todo> {
+    if (todo.id) {
+      return this.updateTodo(todo.id, todo);
+    } else {
+      return this.createTodo(todo);
+    }
   }
 }
