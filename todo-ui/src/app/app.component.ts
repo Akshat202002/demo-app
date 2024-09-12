@@ -1,16 +1,19 @@
- 
-import { Component, OnInit } from '@angular/core'; 
-import { FormsModule } from '@angular/forms'; 
+
+import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterOutlet } from '@angular/router';
 import { TodoService, Todo } from './services/todo.service';
+import { ButtonModule } from 'primeng/button';
+import { RippleModule } from 'primeng/ripple';
+import { InputTextModule } from 'primeng/inputtext';
 
-@Component({ 
-    selector: 'app-root', 
-    standalone: true, 
-    imports: [RouterOutlet, FormsModule], 
+@Component({
+    selector: 'app-root',
+    standalone: true,
+    imports: [RouterOutlet, FormsModule, ButtonModule, RippleModule, InputTextModule],
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'] 
-}) 
+    styleUrls: ['./app.component.scss']
+})
 export class AppComponent implements OnInit {
   title: string = 'Todo App';
   taskName: string = '';
@@ -79,7 +82,7 @@ export class AppComponent implements OnInit {
         this.todoService.searchTodos(this.searchKeyword).subscribe((tasks) => {
             this.tasks = tasks;
         });
-    } 
+    }
   }
 
   updateTaskStatus(task: Todo) {
