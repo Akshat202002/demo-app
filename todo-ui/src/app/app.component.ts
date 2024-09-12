@@ -6,6 +6,7 @@ import { TodoService, Todo } from './services/todo.service';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { InputTextModule } from 'primeng/inputtext';
+import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
 
 @Component({
     selector: 'app-root',
@@ -22,11 +23,13 @@ export class AppComponent implements OnInit {
   isEditMode: boolean = false;
   editIndex: number | null = null;
   searchKeyword: string = '';
+  private searchSubject = new Subject<string>();
 
   constructor(private todoService: TodoService) {}
 
   ngOnInit(): void {
     this.loadTodos();
+    this.setupSearch();
   }
 
   loadTodos(): void {
@@ -75,14 +78,24 @@ export class AppComponent implements OnInit {
     this.editIndex = null;
   }
 
-  searchTasks() {
-    if (this.searchKeyword.trim() === '') {
-        this.loadTodos();
-    } else {
-        this.todoService.searchTodos(this.searchKeyword).subscribe((tasks) => {
-            this.tasks = tasks;
-        });
-    }
+  searchTasks(keyword: string): void {
+    this.searchSubject.next(keyword);
+  }
+
+  setupSearch(): void {
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(keyword => {
+        if (keyword.trim() === '') {
+          return this.todoService.getTodos();
+        } else {
+          return this.todoService.searchTodos(keyword);
+        }
+      })
+    ).subscribe(tasks => {
+      this.tasks = tasks;
+    });
   }
 
   updateTaskStatus(task: Todo) {

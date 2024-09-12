@@ -61,25 +61,26 @@ public class TodoRepository {
         }
     }
 
-    @Transactional(readOnly = true)
-    public List<Todo> searchTodos(String keyword) {
-        try (Session session = sessionFactory.openSession()) {
-            return session
-                    .createQuery("from Todo t where t.name like :keyword or t.description like :keyword", Todo.class)
-                    .setParameter("keyword", "%" + keyword + "%")
-                    .list();
-        }
-    }
-
-    // Using Criteria API
     // @Transactional(readOnly = true)
     // public List<Todo> searchTodos(String keyword) {
     // try (Session session = sessionFactory.openSession()) {
-    // return session.createQuery(
-    // "from Todo t where t.name like :keyword or t.description like :keyword",
-    // Todo.class)
+    // return session
+    // .createQuery("from Todo t where t.name like :keyword or t.description like
+    // :keyword", Todo.class)
     // .setParameter("keyword", "%" + keyword + "%")
     // .list();
     // }
     // }
+
+    // Using Criteria API
+    @Transactional(readOnly = true)
+    public List<Todo> searchTodos(String keyword) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery(
+                    "from Todo t where t.name like :keyword or t.description like :keyword",
+                    Todo.class)
+                    .setParameter("keyword", "%" + keyword + "%")
+                    .list();
+        }
+    }
 }

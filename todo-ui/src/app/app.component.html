@@ -19,7 +19,7 @@
 
     <!-- Search Bar -->
     <div class="mt-5">
-      <input pInputText type="text" placeholder="Search tasks..." [(ngModel)]="searchKeyword" (input)="searchTasks()" class="shadow-2 border-round rounded py-2 px-3 text-gray-700 w-full leading-tight focus:outline-none focus:shadow-outline sm:w-auto">
+      <input pInputText type="text" placeholder="Search tasks..." [(ngModel)]="searchKeyword" (ngModelChange)="searchTasks($event)" class="shadow-2 border-round rounded py-2 px-3 text-gray-700 w-full leading-tight focus:outline-none focus:shadow-outline sm:w-auto">
     </div>
 
     <ul class="mt-5 space-y-4">
