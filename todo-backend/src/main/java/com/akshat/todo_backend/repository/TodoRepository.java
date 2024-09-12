@@ -39,7 +39,11 @@ public class TodoRepository {
     public Todo save(Todo todo) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.persist(todo);
+            if (todo.getId() == null) {
+                session.persist(todo);
+            } else {
+                session.merge(todo);
+            }
             session.getTransaction().commit();
             return todo;
         }
