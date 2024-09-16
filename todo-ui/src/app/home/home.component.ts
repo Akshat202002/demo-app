@@ -7,11 +7,15 @@ import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { InputTextModule } from 'primeng/inputtext';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
+import { TaskFormComponent } from '../task-form/task-form.component';
+import { HeaderComponent } from '../header/header.component';
+import { TaskListComponent } from '../task-list/task-list.component';
+import { SearchBarComponent } from '../search-bar/search-bar.component';
 
 @Component({
     selector: 'app-root',
     standalone: true,
-    imports: [RouterOutlet, FormsModule, ButtonModule, RippleModule, InputTextModule],
+    imports: [RouterOutlet, FormsModule, ButtonModule, RippleModule, InputTextModule, TaskFormComponent, HeaderComponent, TaskListComponent, SearchBarComponent],
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.scss']
 })
@@ -38,9 +42,8 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  addOrUpdateTask(event: Event): void {
-    event.preventDefault();
-    const todo: Todo = { name: this.taskName, description: this.taskDescription };
+  addOrUpdateTask(event: { taskName: string, taskDescription: string }): void {
+    const todo: Todo = { name: event.taskName, description: event.taskDescription };
 
     if (this.isEditMode && this.editIndex !== null) {
       const id = this.tasks[this.editIndex].id!;
