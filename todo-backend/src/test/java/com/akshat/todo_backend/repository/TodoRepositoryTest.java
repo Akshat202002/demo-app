@@ -1,17 +1,16 @@
 package com.akshat.todo_backend.repository;
 
 import com.akshat.todo_backend.model.Todo;
+import jakarta.persistence.EntityManagerFactory;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.stubbing.Answer;
 
-import jakarta.persistence.EntityManagerFactory;
-import org.hibernate.Session;
-
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,10 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class TodoRepositoryTest {
-
-    @InjectMocks
-    private TodoRepository todoRepository;
+class TodoRepositoryTest {
 
     @Mock
     private EntityManagerFactory entityManagerFactory;
@@ -33,64 +29,107 @@ public class TodoRepositoryTest {
     @Mock
     private Session session;
 
-    private Todo todo;
+    @InjectMocks
+    private TodoRepository todoRepository;
 
     @BeforeEach
-    public void setup() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
         when(entityManagerFactory.unwrap(SessionFactory.class)).thenReturn(sessionFactory);
         when(sessionFactory.openSession()).thenReturn(session);
-        todo = new Todo();
-        todo.setId(1L);
-        todo.setName("Test Task");
-        todo.setDescription("Test Description");
-        todo.setCompleted(false);
     }
 
     @Test
-    public void testFindAll() {
-        when(session.createQuery(anyString(), eq(Todo.class))).thenReturn(mock(org.hibernate.query.Query.class));
-        when(session.createQuery(anyString(), eq(Todo.class)).list()).thenReturn(Arrays.asList(todo));
+    void testFindAll() {
+        List<Todo> expectedTodos = List.of(new Todo(), new Todo());
+        when(session.createQuery("from Todo", Todo.class)).thenReturn(mock(org.hibernate.query.Query.class));
+        when(session.createQuery("from Todo", Todo.class).list()).thenReturn(expectedTodos);
 
-        List<Todo> todos = todoRepository.findAll();
-        assertEquals(1, todos.size());
-        assertEquals("Test Task", todos.get(0).getName());
+        List<Todo> actualTodos = todoRepository.findAll();
+        assertEquals(expectedTodos, actualTodos);
+
+        verify(sessionFactory).openSession();
+        verify(session).close();
     }
 
     @Test
-    public void testFindById() {
-        when(session.get(Todo.class, 1L)).thenReturn(todo);
+    void testFindById() {
+        Long id = 1L;
+        Todo todo = new Todo();
+        when(session.get(Todo.class, id)).thenReturn(todo);
 
-        Optional<Todo> foundTodo = todoRepository.findById(1L);
-        assertTrue(foundTodo.isPresent());
-        assertEquals("Test Task", foundTodo.get().getName());
+        Optional<Todo> result = todoRepository.findById(id);
+        assertTrue(result.isPresent());
+        assertEquals(todo, result.get());
+
+        verify(sessionFactory).openSession();
+        verify(session).close();
     }
 
     @Test
-    public void testSave() {
-        when(session.merge(any(Todo.class))).thenReturn(todo);
+    void testSaveNewTodo() {
+        Todo todo = new Todo();
+        todo.setId(null); // New Todo, without an ID
+        doAnswer((Answer<Void>) invocation -> {
+            todo.setId(1L);
+            return null;
+        }).when(session).persist(todo);
 
         Todo savedTodo = todoRepository.save(todo);
-        assertEquals("Test Task", savedTodo.getName());
+        assertNotNull(savedTodo.getId());
+
+        verify(sessionFactory).openSession();
+        verify(session).beginTransaction();
+        verify(session).persist(todo);
+        verify(session).getTransaction().commit();
+        verify(session).close();
     }
 
     @Test
-    public void testDeleteById() {
-        when(session.get(Todo.class, 1L)).thenReturn(todo);
-        doNothing().when(session).remove(any(Todo.class));
+    void testSaveExistingTodo() {
+        Todo todo = new Todo();
+        todo.setId(1L); // Existing Todo
+        when(session.merge(todo)).thenReturn(todo);
 
-        todoRepository.deleteById(1L);
-        verify(session, times(1)).remove(todo);
+        Todo savedTodo = todoRepository.save(todo);
+        assertEquals(1L, savedTodo.getId());
+
+        verify(sessionFactory).openSession();
+        verify(session).beginTransaction();
+        verify(session).merge(todo);
+        verify(session).getTransaction().commit();
+        verify(session).close();
     }
 
     @Test
-    public void testSearchTodos() {
-        when(session.createQuery(anyString(), eq(Todo.class))).thenReturn(mock(org.hibernate.query.Query.class));
-        when(session.createQuery(anyString(), eq(Todo.class)).setParameter(anyString(), anyString()).list())
-                .thenReturn(Arrays.asList(todo));
+    void testDeleteById() {
+        Long id = 1L;
+        Todo todo = new Todo();
+        when(session.get(Todo.class, id)).thenReturn(todo);
 
-        List<Todo> todos = todoRepository.searchTodos("Test");
-        assertEquals(1, todos.size());
-        assertEquals("Test Task", todos.get(0).getName());
+        todoRepository.deleteById(id);
+
+        verify(sessionFactory).openSession();
+        verify(session).beginTransaction();
+        verify(session).get(Todo.class, id);
+        verify(session).remove(todo);
+        verify(session).getTransaction().commit();
+        verify(session).close();
+    }
+
+    @Test
+    void testSearchTodos() {
+        String keyword = "test";
+        List<Todo> expectedTodos = List.of(new Todo(), new Todo());
+        when(session.createQuery("from Todo t where t.name like :keyword or t.description like:keyword", Todo.class))
+                .thenReturn(mock(org.hibernate.query.Query.class));
+        when(session.createQuery("from Todo t where t.name like :keyword or t.description like:keyword", Todo.class)
+                .setParameter("keyword", "%" + keyword + "%").list()).thenReturn(expectedTodos);
+
+        List<Todo> actualTodos = todoRepository.searchTodos(keyword);
+        assertEquals(expectedTodos, actualTodos);
+
+        verify(sessionFactory).openSession();
+        verify(session).close();
     }
 }
