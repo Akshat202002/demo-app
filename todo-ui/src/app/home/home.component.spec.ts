@@ -86,7 +86,6 @@ describe('HomeComponent', () => {
     const mockTodos = [{ id: 1, name: 'Search Result', description: 'Description', completed: false }];
     todoService.searchTodos.and.returnValue(of(mockTodos));
 
-    component.searchKeyword = 'Search';
     component.searchTasks('Search');
 
     expect(component.tasks).toEqual(mockTodos);
