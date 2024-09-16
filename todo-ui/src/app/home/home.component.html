@@ -1,0 +1,45 @@
+<header class="flex w-full justify-content-center bg-gray-800 p-4 text-white">
+  <h1 class="text-center text-3xl font-bold">{{ title }}</h1>
+</header>
+<main class="w-full mx-auto p-4">
+  <div class="m-5">
+    <form class="flex flex-wrap justify-content-center items-center gap-2" (submit)="addOrUpdateTask($event)">
+      <div class="flex flex-column sm:flex-row items-center w-full sm:w-auto gap-2">
+        <div class="flex items-center w-full sm:w-auto">
+          <label for="name" class="pr-5 hidden" aria-label="Name of the task">Name of the Task: </label>
+          <input pInputText type="text" name="name" class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-full sm:w-auto" id="name" placeholder="Input Task" [(ngModel)]="taskName" required>
+        </div>
+        <div class="flex items-center w-full sm:w-auto">
+          <label for="description" class="pr-5 hidden" aria-label="Description of the task">Description: </label>
+          <input pInputText type="text" name="description" class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-full sm:w-auto" id="description" placeholder="Task Description" [(ngModel)]="taskDescription" required>
+        </div>
+        <button pButton type="submit" id="add-task-form" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto">{{ isEditMode ? 'Update Task' : 'Add Task' }}</button>
+      </div>
+    </form>
+
+    <!-- Search Bar -->
+    <div class="mt-5">
+      <input pInputText type="text" placeholder="Search tasks..." [(ngModel)]="searchKeyword" (ngModelChange)="searchTasks($event)" class="shadow-2 border-round rounded py-2 px-3 text-gray-700 w-full leading-tight focus:outline-none focus:shadow-outline sm:w-auto">
+    </div>
+
+    <ul class="mt-5 space-y-4">
+      @for (task of tasks; track task; let i = $index) {
+        <li class="border rounded-lg shadow-md p-4 flex flex-column sm:flex-row justify-between items-start sm:items-center bg-white hover:bg-gray-100 transition duration-300">
+          <div class="flex-1">
+            <h3 class="font-bold text-lg text-gray-800" [class.line-through]="task.completed">{{ task.name }}</h3>
+            <p class="text-gray-600" [class.line-through]="task.completed">{{ task.description }}</p>
+          </div>
+          <div class="flex space-x-2 mt-2 sm:mt-0">
+            <input type="checkbox" [(ngModel)]="task.completed" (change)="updateTaskStatus(task)" class="mr-2">
+            <button (click)="editTask(i)" class="text-yellow-500 hover:text-yellow-700">
+              <span class="material-icons">edit</span>
+            </button>
+            <button (click)="deleteTask(i)" class="text-red-500 hover:text-red-700">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+</main>
